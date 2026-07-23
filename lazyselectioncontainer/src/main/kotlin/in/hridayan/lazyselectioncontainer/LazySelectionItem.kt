@@ -8,7 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.TextLayoutResult
 
@@ -45,7 +46,11 @@ fun Modifier.lazySelectionItem(index: Int): Modifier = composed {
 
     this
         .onGloballyPositioned { coords ->
-            selectionState.updateBounds(index, coords.boundsInWindow())
+            val unclippedBounds = Rect(
+                offset = coords.positionInWindow(),
+                size = coords.size.toSize()
+            )
+            selectionState.updateBounds(index, unclippedBounds)
         }
         .drawBehind {
             val info = selectionState.lineInfos[index] ?: return@drawBehind

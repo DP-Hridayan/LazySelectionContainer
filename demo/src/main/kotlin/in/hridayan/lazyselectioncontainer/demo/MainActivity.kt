@@ -51,7 +51,99 @@ fun DemoScreen() {
         List(100) { index ->
             Message(
                 sender = "Sender $index",
-                body = "This is the body of message #$index. It contains some selectable text to test the LazySelectionContainer functionality. Long press to start selecting!"
+                body = "This is the body of message #$index. It contains some selectable " +
+                        "text to test the LazySelec" +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"+
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "text to test the LazySelec" +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "tionContainer functionality. " +
+                        "Long press to start selecting!"+
+                        "Long press to start selecting!"
             )
         }
     }
