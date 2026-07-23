@@ -95,6 +95,80 @@ fun MySelectableList(items: List<String>) {
 }
 ```
 
+## Understanding `itemToText`
+
+Because Jetpack Compose's `LazyColumn` only renders items that are currently visible on the screen, it destroys the underlying `Text` composables for items that scroll off-screen to save memory. 
+
+If a user selects 500 items and hits **Copy**, the library needs a way to instantly build the copied string without forcing Compose to render all 500 hidden items. This is why you must provide the raw `items` list and the `itemToText` extractor function! It allows the library to bypass the UI and extract the exact string directly from your data object.
+
+### Example 1: The Standard Approach (Recommended)
+If your list displays complex data (like a chat message with a sender and a body), the most performant and recommended approach is to combine them into a single `Text` composable using `buildAnnotatedString`. You then configure `itemToText` to return both parts!
+
+```kotlin
+data class ChatMessage(val sender: String, val body: String)
+
+@Composable
+fun ChatList(messages: List<ChatMessage>) {
+    val listState = rememberLazyListState()
+    
+    LazySelectionContainer(
+        items = messages,
+        // Tell the container exactly how to format the copied text
+        itemToText = { "${it.sender}\n${it.body}" }, 
+        listState = listState,
+    ) { 
+        LazyColumn(state = listState) {
+            itemsIndexed(messages) { index, message ->
+                val combinedText = buildAnnotatedString {
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(message.sender + "\n") }
+                    append(message.body)
+                }
+
+                Text(
+                    text = combinedText,
+                    onTextLayout = rememberLazySelectionTextLayout(index),
+                    modifier = Modifier.lazySelectionItem(index)
+                )
+            }
+        }
+    }
+}
+```
+
+### Example 2: The Flattened List Approach (For Complex Layouts)
+If you *must* use completely separate `Text` composables for the sender and body (due to complex layout requirements), you cannot use a single `lazySelectionItem(index)` because they would fight over the same index. Instead, you must **flatten** your data list so every selectable element gets a unique index.
+
+```kotlin
+@Composable
+fun ComplexChatList(messages: List<ChatMessage>) {
+    val listState = rememberLazyListState()
+
+    // Flatten the messages so Sender and Body are completely separate items with unique indices!
+    val flattenedItems = remember(messages) {
+        messages.flatMap { listOf(it.sender, it.body) }
+    }
+
+    LazySelectionContainer(
+        items = flattenedItems, // Pass the flattened list!
+        itemToText = { it },    // Since it's already a string, just return it
+        listState = listState,
+    ) { 
+        LazyColumn(state = listState) {
+            itemsIndexed(flattenedItems) { index, text ->
+                val isSender = index % 2 == 0
+                
+                Text(
+                    text = text,
+                    style = if (isSender) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodyLarge,
+                    onTextLayout = rememberLazySelectionTextLayout(index),
+                    modifier = Modifier.lazySelectionItem(index)
+                )
+            }
+        }
+    }
+}
+```
+
 ## Customization
 
 You can fully customize the colors, auto-scroll behavior, and handles using `LazySelectionDefaults`.

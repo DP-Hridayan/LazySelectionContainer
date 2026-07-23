@@ -112,7 +112,7 @@ object LazySelectionDefaults {
  * ```
  *
  * @param items The list of data items backing the selectable content.
- * @param itemToText A function to extract selectable text from an item.
+ * @param itemToText A function to extract the string representation of an item. Because lazy lists discard off-screen composables, this function is strictly required so the library can bypass the UI and instantly extract the underlying data when copying large off-screen selections to the clipboard.
  * @param listState The [LazyListState] of the [LazyColumn] inside [content].
  *   Must be the **same** instance passed to the inner [LazyColumn] so that
  *   auto-scroll and handle positioning work correctly.
