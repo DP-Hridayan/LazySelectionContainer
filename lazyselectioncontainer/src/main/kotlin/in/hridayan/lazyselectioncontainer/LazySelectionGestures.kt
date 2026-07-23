@@ -68,16 +68,11 @@ fun <T> Modifier.textSelectionGestures(
                 val longPress = awaitLongPressOrCancellation(down.id)
 
                 if (longPress == null) {
-                    var moved = false
-                    while (true) {
-                        val event = awaitPointerEvent()
-                        val change = event.changes.firstOrNull { it.id == down.id } ?: break
-                        if (change.changedToUpIgnoreConsumed()) break
-                        val dx = change.position.x - down.position.x
-                        val dy = change.position.y - down.position.y
-                        if (kotlin.math.hypot(dx, dy) > touchSlop) moved = true
-                    }
-                    if (!moved && selectionState.selection != null) {
+                    // If longPress is null, the gesture was either a fast tap (pointer is up)
+                    // or a scroll/swipe (pointer moved out of slop but is still down).
+                    // We only want to clear the selection on a clean tap.
+                    val isUp = currentEvent.changes.none { it.pressed }
+                    if (isUp && selectionState.selection != null) {
                         selectionState.clear()
                     }
                     return@awaitEachGesture
