@@ -94,8 +94,8 @@ You can fully customize the colors, auto-scroll behavior, and handles using `Laz
 LazySelectionContainer(
     // ...
     colors = LazySelectionDefaults.colors(
-        handleColor = Color.Red,
-        selectionBackgroundColor = Color.Red.copy(alpha = 0.3f)
+        dragHandleColor = Color.Red,
+        highlightColor = Color.Red.copy(alpha = 0.3f)
     ),
     autoScroll = LazySelectionDefaults.autoScroll(
         scrollThreshold = 48.dp, // Distance from edge to trigger scroll
