@@ -21,7 +21,7 @@ The library is available on Maven Central.
 ### 1. Version Catalog (libs.versions.toml) - Recommended
 ```toml
 [versions]
-lazyselectioncontainer = "1.0.0"
+lazyselectioncontainer = "1.1.0"
 
 [libraries]
 lazyselectioncontainer = { module = "io.github.dp-hridayan:lazyselectioncontainer", version.ref = "lazyselectioncontainer" }
@@ -36,14 +36,14 @@ dependencies {
 ### 2. Kotlin DSL (`build.gradle.kts`)
 ```kotlin
 dependencies {
-    implementation("io.github.dp-hridayan:lazyselectioncontainer:1.0.0")
+    implementation("io.github.dp-hridayan:lazyselectioncontainer:1.1.0")
 }
 ```
 
 ### 3. Groovy (`build.gradle`)
 ```groovy
 dependencies {
-    implementation 'io.github.dp-hridayan:lazyselectioncontainer:1.0.0'
+    implementation 'io.github.dp-hridayan:lazyselectioncontainer:1.1.0'
 }
 ```
 
