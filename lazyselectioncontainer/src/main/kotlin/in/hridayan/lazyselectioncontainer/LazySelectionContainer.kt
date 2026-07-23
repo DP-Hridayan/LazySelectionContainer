@@ -104,8 +104,7 @@ object LazySelectionDefaults {
  * @param magnifierVerticalOffset How far above the drag point the magnifier
  *   loupe is positioned.
  * @param onCopy Callback invoked after a copy operation completes.
- * @param content Your composable content � typically a [LazyColumn]. Receives
- *   [LazySelectionState] so each item can apply [lazySelectionItem].
+ * @param content Your composable content – typically a [LazyColumn]. The selection state is provided via LocalLazySelectionState.
  */
 @Composable
 fun <T> LazySelectionContainer(

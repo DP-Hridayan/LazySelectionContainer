@@ -31,9 +31,6 @@ fun rememberLazySelectionTextLayout(index: Int): (TextLayoutResult) -> Unit {
  * Must be attached to each selectable [Text] component.
  *
  * @param index The index of the item in the list.
- * @param text The text content of the item.
- * @param selectionState The state holder for the selection.
- * @param style The [TextStyle] used to render the text. Must match exactly for correct layout calculations.
  * @param colors Configuration for colors used in text selection.
  */
 @Composable
