@@ -121,7 +121,8 @@ object LazySelectionDefaults {
  * @param colors Configuration for colors used in text selection.
  * @param autoScroll Configuration for edge auto-scrolling during text selection drag.
  * @param magnifier Configuration for the magnifier loupe used during text selection drag.
- * @param onCopy Callback invoked after a copy operation completes.
+ * @param onCopy Callback invoked when the user taps "Copy" in the toolbar.
+ * @param onSelectAll Callback invoked when the user taps "Select All" in the toolbar.
  * @param content Your composable content – typically a [LazyColumn]. The selection state is provided via LocalLazySelectionState.
  */
 @Composable
@@ -135,6 +136,7 @@ fun <T> LazySelectionContainer(
     autoScroll: LazySelectionAutoScroll = LazySelectionDefaults.autoScroll(),
     magnifier: LazySelectionMagnifier = LazySelectionDefaults.magnifier(),
     onCopy: ((success: Boolean) -> Unit)? = null,
+    onSelectAll: (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
@@ -174,6 +176,7 @@ fun <T> LazySelectionContainer(
                 autoScrollEdgeThreshold = autoScroll.scrollThreshold,
                 autoScrollSpeed = autoScroll.scrollSpeed,
                 onCopy = onCopy,
+                onSelectAll = onSelectAll
             )
         }
     }

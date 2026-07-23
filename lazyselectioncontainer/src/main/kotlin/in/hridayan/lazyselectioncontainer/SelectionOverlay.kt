@@ -67,6 +67,7 @@ internal fun <T> SelectionHandlesOverlay(
     autoScrollEdgeThreshold: Dp,
     autoScrollSpeed: Dp,
     onCopy: ((success: Boolean) -> Unit)? = null,
+    onSelectAll: (() -> Unit)? = null,
 ) {
     if (!selectionState.handlesVisible) return
 
@@ -93,6 +94,7 @@ internal fun <T> SelectionHandlesOverlay(
         selectionState.toolbarVisible = false
         selectionState.toolbarPinnedEnd = SelectionEnd.START
         scope.launch { listState.scrollToItem(0) }
+        onSelectAll?.invoke()
     }
 
     val startPosProvider = remember(selectionState) {
