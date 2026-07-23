@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import `in`.hridayan.lazyselectioncontainer.LazySelectionContainer
 import `in`.hridayan.lazyselectioncontainer.lazySelectionItem
 import `in`.hridayan.lazyselectioncontainer.rememberLazySelectionTextLayout
@@ -70,11 +69,14 @@ fun DemoScreen() {
                 modifier = Modifier.fillMaxSize()
             ) {
                 itemsIndexed(dummyItems) { index, item ->
+
+                    val textLayoutResult = rememberLazySelectionTextLayout(index)
+
                     Text(
                         text = item,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Black,
-                        onTextLayout = rememberLazySelectionTextLayout(index),
+                        onTextLayout = textLayoutResult,
                         modifier = Modifier
                             .padding(16.dp)
                             .lazySelectionItem(index = index)

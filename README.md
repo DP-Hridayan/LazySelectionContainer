@@ -88,11 +88,11 @@ fun MySelectableList(items: List<String>) {
         ) {
             itemsIndexed(items) { index, item ->
                 // 3. Register the text layout result
-                val textLayout = rememberLazySelectionTextLayout(index)
+                val textLayoutResult = rememberLazySelectionTextLayout(index)
 
                 Text(
                     text = item,
-                    onTextLayout = textLayout,
+                    onTextLayout = textLayoutResult,
                     // 4. Apply the modifier to your text items!
                     modifier = Modifier.lazySelectionItem(index = index)
                 )
