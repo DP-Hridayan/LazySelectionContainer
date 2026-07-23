@@ -220,7 +220,6 @@ internal fun computeToolbarAnchor(
 ): Pair<Offset, Float>? {
     val sel = selectionState.selection?.normalized() ?: return null
 
-    // Find the first visible selected line (the lowest index currently attached in lineInfos)
     val visibleLines = selectionState.lineInfos.keys.filter { it in sel.startLine..sel.endLine }
     if (visibleLines.isEmpty()) return null
     val topmostVisibleLine = visibleLines.minOrNull() ?: return null
@@ -228,20 +227,17 @@ internal fun computeToolbarAnchor(
     val info = selectionState.lineInfos[topmostVisibleLine] ?: return null
     val textLength = info.layoutResult.layoutInput.text.length
 
-    // Use startOffset if it's the exact start line, otherwise it spans the whole line so we use 0
     val charOffset = if (topmostVisibleLine == sel.startLine) sel.startOffset else 0
     val safeOffset = charOffset.coerceIn(0, textLength)
 
     val cursorRect = info.layoutResult.getCursorRect(safeOffset)
 
-    // Calculate the absolute vertical center in the window
     val windowPoint = info.boundsInWindow.topLeft + Offset(
         cursorRect.left,
         cursorRect.top + cursorRect.height / 2f
     )
     val local = windowPoint - selectionState.containerWindowOrigin
 
-    // Clamp coordinates to the container bounds
     val clampedY = local.y.coerceIn(0f, selectionState.containerHeightPx)
     val clampedX = local.x.coerceIn(0f, selectionState.containerWidthPx)
 

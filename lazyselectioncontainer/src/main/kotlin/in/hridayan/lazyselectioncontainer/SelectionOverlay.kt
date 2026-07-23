@@ -257,7 +257,7 @@ internal fun <T> SelectionHandlesOverlay(
         if (selectionState.toolbarVisible) {
             val toolbarAnchorProvider = remember(selectionState, toolbar.behavior) {
                 {
-                    selectionState.lineInfoVersion // Force recalculation when list scrolls
+                    selectionState.lineInfoVersion
                     when (toolbar.behavior) {
                         LazySelectionToolbarBehavior.PinnedToDragHandle -> {
                             val offset = when (selectionState.toolbarPinnedEnd) {
