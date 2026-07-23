@@ -11,6 +11,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -36,6 +38,29 @@ data class LazySelectionAutoScroll(
 data class LazySelectionMagnifier(
     val verticalOffset: Dp,
     val cornerRadius: Dp
+)
+
+/**
+ * Defines the positioning behavior of the selection toolbar.
+ */
+enum class LazySelectionToolbarBehavior {
+    /**
+     * Pins the toolbar near the active drag handle (start or end).
+     */
+    PinnedToDragHandle,
+
+    /**
+     * Floats the toolbar natively above the topmost visible line of the selection.
+     */
+    FloatingAboveSelection
+}
+
+/**
+ * Configuration for the selection toolbar (Copy / Select All).
+ */
+data class LazySelectionToolbar(
+    val behavior: LazySelectionToolbarBehavior,
+    val shape: Shape
 )
 
 /**
@@ -74,6 +99,17 @@ object LazySelectionDefaults {
     ): LazySelectionMagnifier = LazySelectionMagnifier(
         verticalOffset = verticalOffset,
         cornerRadius = cornerRadius
+    )
+
+    /**
+     * Creates a [LazySelectionToolbar] with the default toolbar behavior parameters.
+     */
+    fun toolbar(
+        behavior: LazySelectionToolbarBehavior = LazySelectionToolbarBehavior.FloatingAboveSelection,
+        shape: Shape = RoundedCornerShape(50)
+    ): LazySelectionToolbar = LazySelectionToolbar(
+        behavior = behavior,
+        shape = shape
     )
 }
 
@@ -121,6 +157,7 @@ object LazySelectionDefaults {
  * @param colors Configuration for colors used in text selection.
  * @param autoScroll Configuration for edge auto-scrolling during text selection drag.
  * @param magnifier Configuration for the magnifier loupe used during text selection drag.
+ * @param toolbar Configuration for the selection toolbar used during text selection.
  * @param onCopy Callback invoked when the user taps "Copy" in the toolbar.
  * @param onSelectAll Callback invoked when the user taps "Select All" in the toolbar.
  * @param content Your composable content – typically a [LazyColumn]. The selection state is provided via LocalLazySelectionState.
@@ -135,6 +172,7 @@ fun <T> LazySelectionContainer(
     colors: LazySelectionColors = LazySelectionDefaults.colors(),
     autoScroll: LazySelectionAutoScroll = LazySelectionDefaults.autoScroll(),
     magnifier: LazySelectionMagnifier = LazySelectionDefaults.magnifier(),
+    toolbar: LazySelectionToolbar = LazySelectionDefaults.toolbar(),
     onCopy: ((success: Boolean) -> Unit)? = null,
     onSelectAll: (() -> Unit)? = null,
     content: @Composable () -> Unit,
@@ -175,8 +213,9 @@ fun <T> LazySelectionContainer(
                 handleColor = colors.dragHandleColor,
                 autoScrollEdgeThreshold = autoScroll.scrollThreshold,
                 autoScrollSpeed = autoScroll.scrollSpeed,
+                toolbar = toolbar,
                 onCopy = onCopy,
-                onSelectAll = onSelectAll
+                onSelectAll = onSelectAll,
             )
         }
     }

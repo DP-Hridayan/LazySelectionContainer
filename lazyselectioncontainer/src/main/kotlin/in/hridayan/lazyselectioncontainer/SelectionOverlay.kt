@@ -3,6 +3,7 @@ package `in`.hridayan.lazyselectioncontainer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.pointerInput
@@ -66,6 +68,7 @@ internal fun <T> SelectionHandlesOverlay(
     handleColor: Color,
     autoScrollEdgeThreshold: Dp,
     autoScrollSpeed: Dp,
+    toolbar: LazySelectionToolbar,
     onCopy: ((success: Boolean) -> Unit)? = null,
     onSelectAll: (() -> Unit)? = null,
 ) {
@@ -252,11 +255,21 @@ internal fun <T> SelectionHandlesOverlay(
         )
 
         if (selectionState.toolbarVisible) {
-            val toolbarAnchorProvider = remember(selectionState) {
+            val toolbarAnchorProvider = remember(selectionState, toolbar.behavior) {
                 {
-                    when (selectionState.toolbarPinnedEnd) {
-                        SelectionEnd.START -> startPosProvider()
-                        SelectionEnd.END -> endPosProvider()
+                    selectionState.lineInfoVersion // Force recalculation when list scrolls
+                    when (toolbar.behavior) {
+                        LazySelectionToolbarBehavior.PinnedToDragHandle -> {
+                            val offset = when (selectionState.toolbarPinnedEnd) {
+                                SelectionEnd.START -> startPosProvider()
+                                SelectionEnd.END -> endPosProvider()
+                            }
+                            offset?.let { Pair(it, 0f) }
+                        }
+
+                        LazySelectionToolbarBehavior.FloatingAboveSelection -> {
+                            computeToolbarAnchor(selectionState)
+                        }
                     }
                 }
             }
@@ -265,6 +278,8 @@ internal fun <T> SelectionHandlesOverlay(
                 anchorProvider = toolbarAnchorProvider,
                 containerWidthPx = selectionState.containerWidthPx,
                 containerHeightPx = selectionState.containerHeightPx,
+                shape = toolbar.shape,
+                behavior = toolbar.behavior,
                 onCopy = ::doCopy,
                 onSelectAll = ::doSelectAll,
             )
@@ -403,9 +418,11 @@ internal fun SelectionHandle(
  */
 @Composable
 internal fun SelectionToolbar(
-    anchorProvider: () -> Offset?,
+    anchorProvider: () -> Pair<Offset, Float>?,
     containerWidthPx: Float,
     containerHeightPx: Float,
+    shape: Shape,
+    behavior: LazySelectionToolbarBehavior,
     onCopy: () -> Unit,
     onSelectAll: () -> Unit,
 ) {
@@ -425,28 +442,48 @@ internal fun SelectionToolbar(
                     layoutDirection: LayoutDirection,
                     popupContentSize: IntSize
                 ): IntOffset {
-                    val anchor = anchorProvider() ?: return IntOffset.Zero
+                    val anchorData = anchorProvider() ?: return IntOffset.Zero
+                    val anchor = anchorData.first
+                    val lineHeight = anchorData.second
 
+                    val paddingPx = with(density) { 20.dp.toPx() }.toInt()
                     val absoluteAnchorY = anchorBounds.top + anchor.y
-                    val fitsAbove = absoluteAnchorY - gapPx - popupContentSize.height >= 0f
 
-                    val absoluteY = if (fitsAbove) {
-                        absoluteAnchorY - gapPx - popupContentSize.height
-                    } else {
-                        absoluteAnchorY + maxOf(gapPx, handleTouchPx)
-                    }
+                    val absoluteY =
+                        if (behavior == LazySelectionToolbarBehavior.FloatingAboveSelection) {
+                            val shift = (lineHeight / 2f) + with(density) { 8.dp.toPx() }
+                            val fitsAbove =
+                                absoluteAnchorY - shift - popupContentSize.height >= paddingPx
+                            if (fitsAbove) {
+                                absoluteAnchorY - shift - popupContentSize.height
+                            } else {
+                                absoluteAnchorY + shift
+                            }
+                        } else {
+                            val fitsAbove =
+                                absoluteAnchorY - gapPx - popupContentSize.height >= paddingPx
+                            if (fitsAbove) {
+                                absoluteAnchorY - gapPx - popupContentSize.height
+                            } else {
+                                absoluteAnchorY + maxOf(gapPx, handleTouchPx)
+                            }
+                        }
 
                     val clampedAbsoluteY = absoluteY.toInt().coerceIn(
-                        0,
-                        (windowSize.height - popupContentSize.height).coerceAtLeast(0)
+                        paddingPx,
+                        (windowSize.height - popupContentSize.height - paddingPx).coerceAtLeast(
+                            paddingPx
+                        )
                     )
 
                     val absoluteAnchorX = anchorBounds.left + anchor.x
                     val absoluteX = absoluteAnchorX - popupContentSize.width / 2f
 
                     val clampedAbsoluteX = absoluteX.toInt().coerceIn(
-                        0,
-                        (windowSize.width - popupContentSize.width).coerceAtLeast(0)
+                        paddingPx,
+                        (windowSize.width - popupContentSize.width - paddingPx).coerceAtLeast(
+                            paddingPx
+                        )
                     )
 
                     return IntOffset(
@@ -462,11 +499,14 @@ internal fun SelectionToolbar(
         properties = PopupProperties(clippingEnabled = false)
     ) {
         Surface(
-            shape = RoundedCornerShape(50),
+            shape = shape,
             tonalElevation = 4.dp,
             shadowElevation = 4.dp
         ) {
-            Row(modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)) {
+            Row(
+                modifier = Modifier.padding(horizontal = 15.dp, vertical = 2.dp),
+                horizontalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
                 SelectionToolbarActionButton(
                     name = stringResource(android.R.string.copy),
                     onClick = onCopy

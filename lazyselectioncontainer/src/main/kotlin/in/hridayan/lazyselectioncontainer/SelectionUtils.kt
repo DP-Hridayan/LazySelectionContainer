@@ -134,11 +134,11 @@ internal fun findLineOffsetOrNearestEdge(
 ): Pair<Int, Int>? {
     // 1. If we are exactly over a text item, return it immediately.
     findLineOffset(state, globalPos)?.let { return it }
-    
+
     if (state.lineInfos.isEmpty()) {
         return null
     }
-    
+
     // 2. If we are in the padding between items (or above/below the entire list),
     // find the text block that is vertically closest to our finger.
     val closestEntry = state.lineInfos.entries.minByOrNull { entry ->
@@ -156,7 +156,7 @@ internal fun findLineOffsetOrNearestEdge(
         x = (globalPos.x - b.left).coerceIn(0f, b.width),
         y = (globalPos.y - b.top).coerceIn(0f, b.height)
     )
-    
+
     val offset = closestEntry.value.layoutResult.getOffsetForPosition(local)
     return closestEntry.key to offset
 }
@@ -209,4 +209,41 @@ internal fun computeMagnifierOffset(
         info.boundsInWindow.top + lineCenterY - selectionState.containerWindowOrigin.y
     val lineHeight = cursorRect.bottom - cursorRect.top
     return Pair(Offset(fingerX, yInContainer), lineHeight)
+}
+
+/**
+ * Computes the native floating anchor for the selection toolbar by finding the topmost
+ * visible selected line and returning its vertical center and line height.
+ */
+internal fun computeToolbarAnchor(
+    selectionState: LazySelectionState
+): Pair<Offset, Float>? {
+    val sel = selectionState.selection?.normalized() ?: return null
+
+    // Find the first visible selected line (the lowest index currently attached in lineInfos)
+    val visibleLines = selectionState.lineInfos.keys.filter { it in sel.startLine..sel.endLine }
+    if (visibleLines.isEmpty()) return null
+    val topmostVisibleLine = visibleLines.minOrNull() ?: return null
+
+    val info = selectionState.lineInfos[topmostVisibleLine] ?: return null
+    val textLength = info.layoutResult.layoutInput.text.length
+
+    // Use startOffset if it's the exact start line, otherwise it spans the whole line so we use 0
+    val charOffset = if (topmostVisibleLine == sel.startLine) sel.startOffset else 0
+    val safeOffset = charOffset.coerceIn(0, textLength)
+
+    val cursorRect = info.layoutResult.getCursorRect(safeOffset)
+
+    // Calculate the absolute vertical center in the window
+    val windowPoint = info.boundsInWindow.topLeft + Offset(
+        cursorRect.left,
+        cursorRect.top + cursorRect.height / 2f
+    )
+    val local = windowPoint - selectionState.containerWindowOrigin
+
+    // Clamp coordinates to the container bounds
+    val clampedY = local.y.coerceIn(0f, selectionState.containerHeightPx)
+    val clampedX = local.x.coerceIn(0f, selectionState.containerWidthPx)
+
+    return Offset(clampedX, clampedY) to cursorRect.height
 }

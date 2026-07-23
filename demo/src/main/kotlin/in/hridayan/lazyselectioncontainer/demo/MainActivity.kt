@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import `in`.hridayan.lazyselectioncontainer.LazySelectionContainer
+import `in`.hridayan.lazyselectioncontainer.LazySelectionDefaults
+import `in`.hridayan.lazyselectioncontainer.LazySelectionToolbarBehavior
 import `in`.hridayan.lazyselectioncontainer.lazySelectionItem
 import `in`.hridayan.lazyselectioncontainer.rememberLazySelectionState
 import `in`.hridayan.lazyselectioncontainer.rememberLazySelectionTextLayout
@@ -51,99 +53,7 @@ fun DemoScreen() {
         List(100) { index ->
             Message(
                 sender = "Sender $index",
-                body = "This is the body of message #$index. It contains some selectable " +
-                        "text to test the LazySelec" +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"+
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "text to test the LazySelec" +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "tionContainer functionality. " +
-                        "Long press to start selecting!"+
-                        "Long press to start selecting!"
+                body = "This is the body of message #$index. It contains some selectable text"
             )
         }
     }
@@ -162,6 +72,7 @@ fun DemoScreen() {
             itemToText = { it },
             listState = listState,
             selectionState = selectionState,
+            toolbar = LazySelectionDefaults.toolbar(behavior = LazySelectionToolbarBehavior.PinnedToDragHandle),
             onCopy = { success ->
                 if (success) {
                     Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
