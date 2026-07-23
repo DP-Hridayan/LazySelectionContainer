@@ -69,7 +69,7 @@ object LazySelectionDefaults {
      * Creates a [LazySelectionMagnifier] with the default magnifier behavior parameters.
      */
     fun magnifier(
-        verticalOffset: Dp = 64.dp,
+        verticalOffset: Dp = 36.dp,
         cornerRadius: Dp = 24.dp
     ): LazySelectionMagnifier = LazySelectionMagnifier(
         verticalOffset = verticalOffset,
@@ -137,7 +137,10 @@ fun <T> LazySelectionContainer(
     onCopy: ((success: Boolean) -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    CompositionLocalProvider(LocalLazySelectionState provides selectionState) {
+    CompositionLocalProvider(
+        LocalLazySelectionState provides selectionState,
+        LocalLazySelectionColors provides colors
+    ) {
         Box(
             modifier = modifier
                 .magnifier(
@@ -145,7 +148,9 @@ fun <T> LazySelectionContainer(
                     magnifierCenter = {
                         val offset = selectionState.magnifierOffset
                             ?: return@magnifier Offset.Unspecified
-                        offset.copy(y = offset.y - magnifier.verticalOffset.toPx())
+                        val shift =
+                            (selectionState.magnifierLineHeightPx / 2f) + magnifier.verticalOffset.toPx()
+                        offset.copy(y = offset.y - shift)
                     },
                     cornerRadius = magnifier.cornerRadius
                 )

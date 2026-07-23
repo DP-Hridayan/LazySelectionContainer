@@ -4,6 +4,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,6 +67,7 @@ class LazySelectionState {
      * Non-null only while a drag is in progress (initial selection or handle drag).
      */
     var magnifierOffset by mutableStateOf<Offset?>(null)
+    internal var magnifierLineHeightPx by mutableFloatStateOf(0f)
 
     /**
      * Map of currently composed line indices to their layout information.

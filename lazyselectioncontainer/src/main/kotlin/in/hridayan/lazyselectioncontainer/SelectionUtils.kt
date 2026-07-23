@@ -1,4 +1,4 @@
-﻿package `in`.hridayan.lazyselectioncontainer
+package `in`.hridayan.lazyselectioncontainer
 
 import android.content.ClipData
 import androidx.compose.foundation.gestures.scrollBy
@@ -187,7 +187,7 @@ internal fun computeMagnifierOffset(
     lineIndex: Int,
     charOffset: Int,
     fingerX: Float,
-): Offset? {
+): Pair<Offset, Float>? {
     val info = selectionState.lineInfos[lineIndex] ?: return null
     val textLength = info.layoutResult.layoutInput.text.length
     val safeOffset = charOffset.coerceIn(0, textLength)
@@ -195,5 +195,6 @@ internal fun computeMagnifierOffset(
     val lineCenterY = (cursorRect.top + cursorRect.bottom) / 2f
     val yInContainer =
         info.boundsInWindow.top + lineCenterY - selectionState.containerWindowOrigin.y
-    return Offset(fingerX, yInContainer)
+    val lineHeight = cursorRect.bottom - cursorRect.top
+    return Pair(Offset(fingerX, yInContainer), lineHeight)
 }

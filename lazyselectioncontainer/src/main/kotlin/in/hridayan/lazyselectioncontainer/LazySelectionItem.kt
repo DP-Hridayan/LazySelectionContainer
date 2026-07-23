@@ -11,7 +11,6 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.TextStyle
 
 /**
  * Internal representation of a line's layout information used for selection hit-testing
@@ -31,16 +30,14 @@ fun rememberLazySelectionTextLayout(index: Int): (TextLayoutResult) -> Unit {
  * Must be attached to each selectable [Text] component.
  *
  * @param index The index of the item in the list.
- * @param colors Configuration for colors used in text selection.
  */
 @Composable
-fun Modifier.lazySelectionItem(
-    index: Int,
-    colors: LazySelectionColors = LazySelectionDefaults.colors(),
-): Modifier = composed {
+fun Modifier.lazySelectionItem(index: Int): Modifier = composed {
 
     val selectionState = LocalLazySelectionState.current
         ?: error("Modifier.lazySelectionItem must be used inside a LazySelectionContainer")
+
+    val colors = LocalLazySelectionColors.current ?: LazySelectionDefaults.colors()
 
     DisposableEffect(index) {
         onDispose { selectionState.releaseItem(index) }

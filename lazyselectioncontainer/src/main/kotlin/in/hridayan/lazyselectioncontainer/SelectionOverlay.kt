@@ -156,9 +156,15 @@ internal fun <T> SelectionHandlesOverlay(
                 val result = findLineOffsetOrNearestEdge(selectionState, global)
                 val anchor = dragAnchor.value
                 if (result != null && anchor != null) {
-                    selectionState.magnifierOffset = computeMagnifierOffset(
+                    val magResult = computeMagnifierOffset(
                         selectionState, result.first, result.second, rawPos.x
                     )
+                    if (magResult != null) {
+                        selectionState.magnifierOffset = magResult.first
+                        selectionState.magnifierLineHeightPx = magResult.second
+                    } else {
+                        selectionState.magnifierOffset = null
+                    }
                     // Dragged position = start, anchor = end.
                     // Normalization swaps them for display if they cross.
                     selectionState.selection = LineSelection(
@@ -214,9 +220,15 @@ internal fun <T> SelectionHandlesOverlay(
                 val result = findLineOffsetOrNearestEdge(selectionState, global)
                 val anchor = dragAnchor.value
                 if (result != null && anchor != null) {
-                    selectionState.magnifierOffset = computeMagnifierOffset(
+                    val magResult = computeMagnifierOffset(
                         selectionState, result.first, result.second, rawPos.x
                     )
+                    if (magResult != null) {
+                        selectionState.magnifierOffset = magResult.first
+                        selectionState.magnifierLineHeightPx = magResult.second
+                    } else {
+                        selectionState.magnifierOffset = null
+                    }
                     // Anchor = start, dragged position = end.
                     // Normalization swaps them for display if they cross.
                     selectionState.selection = LineSelection(

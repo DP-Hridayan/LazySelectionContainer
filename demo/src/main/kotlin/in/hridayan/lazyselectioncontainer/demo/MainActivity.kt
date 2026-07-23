@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import `in`.hridayan.lazyselectioncontainer.LazySelectionContainer
 import `in`.hridayan.lazyselectioncontainer.lazySelectionItem
@@ -74,8 +73,7 @@ fun DemoScreen() {
 
                     Text(
                         text = item,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Black,
+                        style = MaterialTheme.typography.bodyLarge,
                         onTextLayout = textLayoutResult,
                         modifier = Modifier
                             .padding(16.dp)

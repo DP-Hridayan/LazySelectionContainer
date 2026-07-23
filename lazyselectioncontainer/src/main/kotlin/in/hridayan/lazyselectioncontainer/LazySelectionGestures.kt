@@ -95,9 +95,15 @@ fun <T> Modifier.textSelectionGestures(
                     LineSelection(start.first, wordRange.first, start.first, wordRange.last)
 
                 val pointerPosRef = Ref(longPress.position)
-                selectionState.magnifierOffset = computeMagnifierOffset(
+                val magResult1 = computeMagnifierOffset(
                     selectionState, start.first, start.second, longPress.position.x
                 )
+                if (magResult1 != null) {
+                    selectionState.magnifierOffset = magResult1.first
+                    selectionState.magnifierLineHeightPx = magResult1.second
+                } else {
+                    selectionState.magnifierOffset = null
+                }
 
                 val initialLine = start.first
                 val initialWordRange = wordRange
@@ -139,9 +145,15 @@ fun <T> Modifier.textSelectionGestures(
                                 }
                             }
 
-                            selectionState.magnifierOffset = computeMagnifierOffset(
+                            val magResult2 = computeMagnifierOffset(
                                 selectionState, end.first, end.second, pointerPosRef.value.x
                             )
+                            if (magResult2 != null) {
+                                selectionState.magnifierOffset = magResult2.first
+                                selectionState.magnifierLineHeightPx = magResult2.second
+                            } else {
+                                selectionState.magnifierOffset = null
+                            }
                         }
                         delay(16.milliseconds)
                     }
