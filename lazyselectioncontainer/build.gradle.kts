@@ -42,7 +42,7 @@ mavenPublishing {
     coordinates(
         groupId = "io.github.dp-hridayan",
         artifactId = "lazyselectioncontainer",
-        version = "1.1.0"
+        version = "1.2.0"
     )
 
     pom {
