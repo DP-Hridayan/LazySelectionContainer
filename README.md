@@ -117,7 +117,10 @@ LazySelectionContainer(
         scrollThreshold = 48.dp, // Distance from edge to trigger scroll
         maxScrollSpeed = 6.dp    // Max pixels to scroll per frame
     ),
-    magnifierVerticalOffset = 48.dp // Move the loupe higher/lower
+    magnifier = LazySelectionDefaults.magnifier(
+        verticalOffset = 64.dp, // Move the loupe higher/lower
+        cornerRadius = 24.dp    // Change the shape of the magnifier
+    )
 ) {
    // ...
 }

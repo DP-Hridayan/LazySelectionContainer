@@ -31,6 +31,14 @@ data class LazySelectionAutoScroll(
 )
 
 /**
+ * Configuration for the magnifier loupe used during text selection.
+ */
+data class LazySelectionMagnifier(
+    val verticalOffset: Dp,
+    val cornerRadius: Dp
+)
+
+/**
  * Default configurations for [LazySelectionContainer].
  */
 object LazySelectionDefaults {
@@ -55,6 +63,17 @@ object LazySelectionDefaults {
     ): LazySelectionAutoScroll = LazySelectionAutoScroll(
         scrollThreshold = scrollThreshold,
         scrollSpeed = scrollSpeed
+    )
+
+    /**
+     * Creates a [LazySelectionMagnifier] with the default magnifier behavior parameters.
+     */
+    fun magnifier(
+        verticalOffset: Dp = 64.dp,
+        cornerRadius: Dp = 24.dp
+    ): LazySelectionMagnifier = LazySelectionMagnifier(
+        verticalOffset = verticalOffset,
+        cornerRadius = cornerRadius
     )
 }
 
@@ -101,8 +120,7 @@ object LazySelectionDefaults {
  * @param selectionState The state holder for the selection.
  * @param colors Configuration for colors used in text selection.
  * @param autoScroll Configuration for edge auto-scrolling during text selection drag.
- * @param magnifierVerticalOffset How far above the drag point the magnifier
- *   loupe is positioned.
+ * @param magnifier Configuration for the magnifier loupe used during text selection drag.
  * @param onCopy Callback invoked after a copy operation completes.
  * @param content Your composable content – typically a [LazyColumn]. The selection state is provided via LocalLazySelectionState.
  */
@@ -115,7 +133,7 @@ fun <T> LazySelectionContainer(
     selectionState: LazySelectionState = rememberSelectionState(),
     colors: LazySelectionColors = LazySelectionDefaults.colors(),
     autoScroll: LazySelectionAutoScroll = LazySelectionDefaults.autoScroll(),
-    magnifierVerticalOffset: Dp = 64.dp,
+    magnifier: LazySelectionMagnifier = LazySelectionDefaults.magnifier(),
     onCopy: ((success: Boolean) -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
@@ -127,9 +145,9 @@ fun <T> LazySelectionContainer(
                     magnifierCenter = {
                         val offset = selectionState.magnifierOffset
                             ?: return@magnifier Offset.Unspecified
-                        offset.copy(y = offset.y - magnifierVerticalOffset.toPx())
+                        offset.copy(y = offset.y - magnifier.verticalOffset.toPx())
                     },
-                    cornerRadius = 24.dp
+                    cornerRadius = magnifier.cornerRadius
                 )
                 .textSelectionGestures(
                     selectionState = selectionState,
