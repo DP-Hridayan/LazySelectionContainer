@@ -65,10 +65,11 @@ import in.hridayan.lazyselectioncontainer.LazySelectionContainer
 import in.hridayan.lazyselectioncontainer.lazySelectionItem
 import in.hridayan.lazyselectioncontainer.rememberSelectionState
 
+import `in`.hridayan.lazyselectioncontainer.rememberLazySelectionTextLayout
+
 @Composable
 fun MySelectableList(items: List<String>) {
     val listState = rememberLazyListState()
-    val selectionState = rememberSelectionState()
 
     // 1. Wrap your lazy list in the container
     LazySelectionContainer(
@@ -76,7 +77,6 @@ fun MySelectableList(items: List<String>) {
         items = items,
         itemToText = { it }, // Tell the container how to extract text from your item
         listState = listState,
-        selectionState = selectionState,
         onCopy = { success ->
             if (success) println("Copied to clipboard!")
         }
@@ -89,7 +89,9 @@ fun MySelectableList(items: List<String>) {
             itemsIndexed(items) { index, item ->
                 Text(
                     text = item,
-                    // 3. Apply the modifier to your text items!
+                    // 3. Register the text layout result
+                    onTextLayout = rememberLazySelectionTextLayout(index),
+                    // 4. Apply the modifier to your text items!
                     modifier = Modifier.lazySelectionItem(index = index)
                 )
             }
