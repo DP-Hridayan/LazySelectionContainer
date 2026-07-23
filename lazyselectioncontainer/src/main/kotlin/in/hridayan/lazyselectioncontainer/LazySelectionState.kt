@@ -149,5 +149,15 @@ class LazySelectionState {
  * Creates and remembers a [LazySelectionState] instance.
  */
 @Composable
-fun rememberSelectionState(): LazySelectionState = remember { LazySelectionState() }
+fun rememberLazySelectionState(): LazySelectionState = remember { LazySelectionState() }
+
+/**
+ * Creates and remembers a [LazySelectionState] instance.
+ */
+@Deprecated(
+    message = "Use rememberLazySelectionState() instead.",
+    replaceWith = ReplaceWith("rememberLazySelectionState()", "in.hridayan.lazyselectioncontainer.rememberLazySelectionState")
+)
+@Composable
+fun rememberSelectionState(): LazySelectionState = rememberLazySelectionState()
 

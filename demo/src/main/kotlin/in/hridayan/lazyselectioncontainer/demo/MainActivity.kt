@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import `in`.hridayan.lazyselectioncontainer.LazySelectionContainer
 import `in`.hridayan.lazyselectioncontainer.lazySelectionItem
+import `in`.hridayan.lazyselectioncontainer.rememberLazySelectionState
 import `in`.hridayan.lazyselectioncontainer.rememberLazySelectionTextLayout
 
 class MainActivity : ComponentActivity() {
@@ -42,6 +43,7 @@ class MainActivity : ComponentActivity() {
 fun DemoScreen() {
     val context = LocalContext.current
     val listState = rememberLazyListState()
+    val selectionState = rememberLazySelectionState()
 
     val dummyItems = remember {
         List(100) { index ->
@@ -57,6 +59,7 @@ fun DemoScreen() {
             items = dummyItems,
             itemToText = { it },
             listState = listState,
+            selectionState = selectionState,
             onCopy = { success ->
                 if (success) {
                     Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()

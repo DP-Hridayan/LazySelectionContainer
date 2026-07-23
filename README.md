@@ -54,16 +54,25 @@ dependencies {
 Using `LazySelectionContainer` is incredibly simple. Wrap your `LazyColumn` and apply the `lazySelectionItem` modifier to your selectable text.
 
 ```kotlin
+import in.hridayan.lazyselectioncontainer.lazySelectionItem
+import in.hridayan.lazyselectioncontainer.rememberLazySelectionState
+import in.hridayan.lazyselectioncontainer.rememberLazySelectionTextLayout
+
 @Composable
 fun MySelectableList(items: List<String>) {
     val listState = rememberLazyListState()
+    val selectionState = rememberLazySelectionState()
 
     // 1. Wrap your lazy list in the container
     LazySelectionContainer(
         modifier = Modifier.fillMaxSize(),
-        listState = listState
         items = items,
         itemToText = { it }, // Tell the container how to extract text from your item
+        listState = listState,
+        selectionState = selectionState,
+        onCopy = { success ->
+            if (success) println("Copied to clipboard!")
+        }
     ) { 
         // 2. Build your lazy list as normal
         LazyColumn(

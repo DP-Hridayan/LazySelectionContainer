@@ -131,7 +131,7 @@ fun <T> LazySelectionContainer(
     items: List<T>,
     itemToText: (T) -> String,
     listState: LazyListState,
-    selectionState: LazySelectionState = rememberSelectionState(),
+    selectionState: LazySelectionState = rememberLazySelectionState(),
     colors: LazySelectionColors = LazySelectionDefaults.colors(),
     autoScroll: LazySelectionAutoScroll = LazySelectionDefaults.autoScroll(),
     magnifier: LazySelectionMagnifier = LazySelectionDefaults.magnifier(),
