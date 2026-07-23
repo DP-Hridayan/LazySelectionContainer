@@ -54,19 +54,6 @@ dependencies {
 Using `LazySelectionContainer` is incredibly simple. Wrap your `LazyColumn` and apply the `lazySelectionItem` modifier to your selectable text.
 
 ```kotlin
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import in.hridayan.lazyselectioncontainer.LazySelectionContainer
-import in.hridayan.lazyselectioncontainer.lazySelectionItem
-import in.hridayan.lazyselectioncontainer.rememberSelectionState
-
-import `in`.hridayan.lazyselectioncontainer.rememberLazySelectionTextLayout
-
 @Composable
 fun MySelectableList(items: List<String>) {
     val listState = rememberLazyListState()
@@ -74,12 +61,9 @@ fun MySelectableList(items: List<String>) {
     // 1. Wrap your lazy list in the container
     LazySelectionContainer(
         modifier = Modifier.fillMaxSize(),
+        listState = listState
         items = items,
         itemToText = { it }, // Tell the container how to extract text from your item
-        listState = listState,
-        onCopy = { success ->
-            if (success) println("Copied to clipboard!")
-        }
     ) { 
         // 2. Build your lazy list as normal
         LazyColumn(
@@ -94,7 +78,7 @@ fun MySelectableList(items: List<String>) {
                     text = item,
                     onTextLayout = textLayoutResult,
                     // 4. Apply the modifier to your text items!
-                    modifier = Modifier.lazySelectionItem(index = index)
+                    modifier = Modifier.lazySelectionItem(index)
                 )
             }
         }
