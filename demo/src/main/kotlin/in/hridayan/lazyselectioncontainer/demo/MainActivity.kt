@@ -72,7 +72,7 @@ fun DemoScreen() {
             itemToText = { it },
             listState = listState,
             selectionState = selectionState,
-            toolbar = LazySelectionDefaults.toolbar(behavior = LazySelectionToolbarBehavior.PinnedToDragHandle),
+            toolbar = LazySelectionDefaults.toolbar(behavior = LazySelectionToolbarBehavior.FloatingAboveSelection),
             onCopy = { success ->
                 if (success) {
                     Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
