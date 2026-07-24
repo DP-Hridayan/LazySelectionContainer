@@ -1,54 +1,17 @@
 package `in`.hridayan.lazyselectioncontainer
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntRect
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupPositionProvider
-import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Represents the end of the selection that the toolbar should be anchored to.
@@ -127,7 +90,7 @@ internal fun <T> SelectionHandlesOverlay(
     Box(
         modifier = modifier.zIndex(10f)
     ) {
-        SelectionHandle(
+        SelectionDragHandle(
             positionProvider = startPosProvider,
             isStartVisual = true,
             color = handleColor,
@@ -191,7 +154,7 @@ internal fun <T> SelectionHandlesOverlay(
             },
         )
 
-        SelectionHandle(
+        SelectionDragHandle(
             positionProvider = endPosProvider,
             isStartVisual = false,
             color = handleColor,
@@ -279,266 +242,12 @@ internal fun <T> SelectionHandlesOverlay(
                 containerWidthPx = selectionState.containerWidthPx,
                 containerHeightPx = selectionState.containerHeightPx,
                 shape = toolbar.shape,
+                containerColor = toolbar.containerColor,
+                contentColor = toolbar.contentColor,
                 behavior = toolbar.behavior,
                 onCopy = ::doCopy,
                 onSelectAll = ::doSelectAll,
             )
         }
-    }
-}
-
-internal val startHandleShape =
-    RoundedCornerShape(
-        topStartPercent = 50,
-        topEndPercent = 0,
-        bottomEndPercent = 50,
-        bottomStartPercent = 50
-    )
-internal val endHandleShape =
-    RoundedCornerShape(
-        topStartPercent = 0,
-        topEndPercent = 50,
-        bottomEndPercent = 50,
-        bottomStartPercent = 50
-    )
-
-/**
- * A draggable selection handle.
- */
-@Composable
-internal fun SelectionHandle(
-    positionProvider: () -> Offset?,
-    isStartVisual: Boolean,
-    color: Color,
-    selectionState: LazySelectionState,
-    listState: LazyListState,
-    edgeThresholdPx: Float,
-    scrollSpeedPx: Float,
-    onTap: () -> Unit,
-    onDragStart: () -> Unit,
-    onDragEnd: () -> Unit,
-    onDragTo: (rawPositionInContainer: Offset) -> Unit,
-) {
-    val density = LocalDensity.current
-    val handleVisualSizeDp = 28.dp
-    val handleTouchSizeDp = 48.dp
-    val coroutineScope = rememberCoroutineScope()
-    val handleTouchPx = with(density) { handleTouchSizeDp.toPx() }
-
-    val currentPositionProvider by rememberUpdatedState(positionProvider)
-    val currentOnTap by rememberUpdatedState(onTap)
-    val currentOnDragStart by rememberUpdatedState(onDragStart)
-    val currentOnDragEnd by rememberUpdatedState(onDragEnd)
-    val currentOnDragTo by rememberUpdatedState(onDragTo)
-
-    val popupPositionProvider = remember(isStartVisual, handleTouchPx) {
-        object : PopupPositionProvider {
-            override fun calculatePosition(
-                anchorBounds: IntRect,
-                windowSize: IntSize,
-                layoutDirection: LayoutDirection,
-                popupContentSize: IntSize
-            ): IntOffset {
-                val pos =
-                    positionProvider() ?: return IntOffset(-10000, -10000)
-                val x = if (isStartVisual) pos.x - handleTouchPx else pos.x
-                return IntOffset(
-                    x = anchorBounds.left + x.toInt(),
-                    y = anchorBounds.top + pos.y.toInt()
-                )
-            }
-        }
-    }
-
-    Popup(
-        popupPositionProvider = popupPositionProvider,
-        properties = PopupProperties(clippingEnabled = false)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(handleTouchSizeDp)
-                .pointerInput(Unit) {
-                    awaitEachGesture {
-                        val down = awaitFirstDown(requireUnconsumed = false)
-                        down.consume()
-
-                        var isDragging = false
-                        var raw = currentPositionProvider() ?: Offset.Zero
-                        val pointerPosRef = Ref(raw)
-
-                        val loopJob = coroutineScope.launch {
-                            while (isActive) {
-                                autoScrollIfNearEdge(
-                                    listState,
-                                    pointerPosRef.value.y,
-                                    selectionState.containerHeightPx,
-                                    edgeThresholdPx,
-                                    scrollSpeedPx
-                                )
-                                currentOnDragTo(pointerPosRef.value)
-                                delay(16.milliseconds)
-                            }
-                        }
-
-                        while (true) {
-                            val event = awaitPointerEvent()
-                            val change = event.changes.firstOrNull { it.id == down.id } ?: break
-                            if (change.changedToUpIgnoreConsumed()) {
-                                change.consume()
-                                break
-                            }
-                            val delta = change.positionChange()
-                            change.consume()
-                            if (!isDragging) {
-                                isDragging = true
-                                currentOnDragStart()
-                            }
-                            raw += delta
-                            pointerPosRef.value = raw
-                        }
-
-                        loopJob.cancel()
-                        if (isDragging) currentOnDragEnd() else currentOnTap()
-                    }
-                }
-        ) {
-            Box(
-                modifier = Modifier
-                    .align(if (isStartVisual) Alignment.TopEnd else Alignment.TopStart)
-                    .size(handleVisualSizeDp)
-                    .clip(if (isStartVisual) startHandleShape else endHandleShape)
-                    .background(color)
-            )
-        }
-    }
-}
-
-/**
- * A floating toolbar providing actions like Copy and Select All for the current selection.
- */
-@Composable
-internal fun SelectionToolbar(
-    anchorProvider: () -> Pair<Offset, Float>?,
-    containerWidthPx: Float,
-    containerHeightPx: Float,
-    shape: Shape,
-    behavior: LazySelectionToolbarBehavior,
-    onCopy: () -> Unit,
-    onSelectAll: () -> Unit,
-) {
-    val density = LocalDensity.current
-    val textStyle = LocalTextStyle.current
-    val gapPx = with(density) { textStyle.lineHeight.toPx() }
-    val handleTouchPx = with(density) { 48.dp.toPx() }
-
-    val anchorInContainer = anchorProvider() ?: return
-
-    val popupPositionProvider =
-        remember(containerWidthPx, containerHeightPx, gapPx, handleTouchPx) {
-            object : PopupPositionProvider {
-                override fun calculatePosition(
-                    anchorBounds: IntRect,
-                    windowSize: IntSize,
-                    layoutDirection: LayoutDirection,
-                    popupContentSize: IntSize
-                ): IntOffset {
-                    val anchorData = anchorProvider() ?: return IntOffset.Zero
-                    val anchor = anchorData.first
-                    val lineHeight = anchorData.second
-
-                    val paddingPx = with(density) { 20.dp.toPx() }.toInt()
-                    val absoluteAnchorY = anchorBounds.top + anchor.y
-
-                    val absoluteY =
-                        if (behavior == LazySelectionToolbarBehavior.FloatingAboveSelection) {
-                            val shift = (lineHeight / 2f) + with(density) { 8.dp.toPx() }
-                            val fitsAbove =
-                                absoluteAnchorY - shift - popupContentSize.height >= paddingPx
-                            if (fitsAbove) {
-                                absoluteAnchorY - shift - popupContentSize.height
-                            } else {
-                                absoluteAnchorY + shift
-                            }
-                        } else {
-                            val fitsAbove =
-                                absoluteAnchorY - gapPx - popupContentSize.height >= paddingPx
-                            if (fitsAbove) {
-                                absoluteAnchorY - gapPx - popupContentSize.height
-                            } else {
-                                absoluteAnchorY + maxOf(gapPx, handleTouchPx)
-                            }
-                        }
-
-                    val clampedAbsoluteY = absoluteY.toInt().coerceIn(
-                        paddingPx,
-                        (windowSize.height - popupContentSize.height - paddingPx).coerceAtLeast(
-                            paddingPx
-                        )
-                    )
-
-                    val absoluteAnchorX = anchorBounds.left + anchor.x
-                    val absoluteX = absoluteAnchorX - popupContentSize.width / 2f
-
-                    val clampedAbsoluteX = absoluteX.toInt().coerceIn(
-                        paddingPx,
-                        (windowSize.width - popupContentSize.width - paddingPx).coerceAtLeast(
-                            paddingPx
-                        )
-                    )
-
-                    return IntOffset(
-                        x = clampedAbsoluteX,
-                        y = clampedAbsoluteY
-                    )
-                }
-            }
-        }
-
-    Popup(
-        popupPositionProvider = popupPositionProvider,
-        properties = PopupProperties(clippingEnabled = false)
-    ) {
-        Surface(
-            shape = shape,
-            tonalElevation = 4.dp,
-            shadowElevation = 4.dp
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 15.dp, vertical = 2.dp),
-                horizontalArrangement = Arrangement.spacedBy(5.dp)
-            ) {
-                SelectionToolbarActionButton(
-                    name = stringResource(android.R.string.copy),
-                    onClick = onCopy
-                )
-
-                SelectionToolbarActionButton(
-                    name = stringResource(android.R.string.selectAll),
-                    onClick = onSelectAll
-                )
-            }
-        }
-    }
-}
-
-@Composable
-internal fun SelectionToolbarActionButton(
-    modifier: Modifier = Modifier,
-    name: String,
-    onClick: () -> Unit
-) {
-    val haptic = LocalHapticFeedback.current
-
-    TextButton(
-        modifier = modifier,
-        onClick = {
-            haptic.performHapticFeedback(HapticFeedbackType.VirtualKey)
-            onClick()
-        },
-        colors = ButtonDefaults.textButtonColors(
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    ) {
-        Text(name)
     }
 }
