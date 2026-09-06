@@ -2,7 +2,7 @@ site_name: LazySelectionContainer
 site_description: A robust and highly-customizable text selection container for Jetpack Compose LazyLists.
 repo_url: https://github.com/dp-hridayan/LazySelectionContainer
 repo_name: dp-hridayan/LazySelectionContainer
-edit_uri: edit/main/docs/
+edit_uri: edit/master/docs/
 
 theme:
   name: material
