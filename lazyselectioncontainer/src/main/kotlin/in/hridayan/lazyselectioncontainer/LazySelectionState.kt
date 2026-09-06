@@ -83,10 +83,6 @@ class LazySelectionState {
     internal var containerHeightPx: Float = 0f
     internal var containerWidthPx: Float = 0f
 
-    // --- Layout capture, sourced directly from each item's real Text/onTextLayout ---
-    // windowBoundsOf and layoutResultOf are filled independently (onGloballyPositioned
-    // vs onTextLayout fire in no guaranteed order on the first frame), and merged into
-    // lineInfos once both halves for a given index are available.
     private val windowBoundsOf = mutableMapOf<Int, Rect>()
     private val layoutResultOf = mutableMapOf<Int, TextLayoutResult>()
 

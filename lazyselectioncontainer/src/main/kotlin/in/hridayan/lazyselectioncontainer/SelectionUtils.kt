@@ -132,15 +132,12 @@ internal fun findLineOffsetOrNearestEdge(
     state: LazySelectionState,
     globalPos: Offset
 ): Pair<Int, Int>? {
-    // 1. If we are exactly over a text item, return it immediately.
     findLineOffset(state, globalPos)?.let { return it }
 
     if (state.lineInfos.isEmpty()) {
         return null
     }
 
-    // 2. If we are in the padding between items (or above/below the entire list),
-    // find the text block that is vertically closest to our finger.
     val closestEntry = state.lineInfos.entries.minByOrNull { entry ->
         val b = entry.value.boundsInWindow
         when {
@@ -150,7 +147,6 @@ internal fun findLineOffsetOrNearestEdge(
         }
     } ?: return null
 
-    // 3. Coerce the pointer coordinates to be inside that closest text block
     val b = closestEntry.value.boundsInWindow
     val local = Offset(
         x = (globalPos.x - b.left).coerceIn(0f, b.width),

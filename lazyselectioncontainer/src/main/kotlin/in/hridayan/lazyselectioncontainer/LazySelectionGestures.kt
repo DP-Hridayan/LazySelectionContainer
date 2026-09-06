@@ -59,7 +59,6 @@ fun <T> Modifier.textSelectionGestures(
             selectionState.containerWidthPx = coords.size.width.toFloat()
         }
         .pointerInput(Unit) {
-            val touchSlop = viewConfiguration.touchSlop
             awaitEachGesture {
                 val down = awaitFirstDown(requireUnconsumed = false)
                 if (down.isConsumed) return@awaitEachGesture
@@ -67,9 +66,6 @@ fun <T> Modifier.textSelectionGestures(
                 val longPress = awaitLongPressOrCancellation(down.id)
 
                 if (longPress == null) {
-                    // If longPress is null, the gesture was either a fast tap (pointer is up)
-                    // or a scroll/swipe (pointer moved out of slop but is still down).
-                    // We only want to clear the selection on a clean tap.
                     val isUp = currentEvent.changes.none { it.pressed }
                     if (isUp && selectionState.selection != null) {
                         selectionState.clear()
