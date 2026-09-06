@@ -48,3 +48,6 @@ nav:
   - Overview: index.md
   - Usage Guide: usage.md
   - Customization: customization.md
+plugins:
+  - search
+  - macros

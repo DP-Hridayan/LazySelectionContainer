@@ -22,7 +22,7 @@ The library is available on Maven Central.
 
     ```toml
     [versions]
-    lazyselectioncontainer = "1.4.0"
+    lazyselectioncontainer = "{{ library_version() }}"
 
     [libraries]
     lazyselectioncontainer = { module = "io.github.dp-hridayan:lazyselectioncontainer", version.ref = "lazyselectioncontainer" }
@@ -38,7 +38,7 @@ The library is available on Maven Central.
 
     ```kotlin
     dependencies {
-        implementation("io.github.dp-hridayan:lazyselectioncontainer:1.4.0")
+        implementation("io.github.dp-hridayan:lazyselectioncontainer:{{ library_version() }}")
     }
     ```
 
@@ -46,6 +46,6 @@ The library is available on Maven Central.
 
     ```groovy
     dependencies {
-        implementation 'io.github.dp-hridayan:lazyselectioncontainer:1.4.0'
+        implementation 'io.github.dp-hridayan:lazyselectioncontainer:{{ library_version() }}'
     }
     ```
