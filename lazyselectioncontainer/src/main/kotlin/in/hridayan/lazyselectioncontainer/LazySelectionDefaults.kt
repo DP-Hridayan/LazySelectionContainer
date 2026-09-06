@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,14 @@ data class LazySelectionAutoScroll(
 data class LazySelectionMagnifier(
     val verticalOffset: Dp,
     val cornerRadius: Dp
+)
+
+/**
+ * Configuration for haptics used during text selection.
+ */
+data class LazySelectionHaptics(
+    val enabled: Boolean,
+    val hapticFeedbackType: HapticFeedbackType?
 )
 
 /**
@@ -95,6 +104,17 @@ object LazySelectionDefaults {
     ): LazySelectionMagnifier = LazySelectionMagnifier(
         verticalOffset = verticalOffset,
         cornerRadius = cornerRadius
+    )
+
+    /**
+     * Creates a [LazySelectionHaptics] with the default haptics configuration.
+     */
+    fun haptics(
+        enabled: Boolean = true,
+        hapticFeedbackType: HapticFeedbackType? = HapticFeedbackType.TextHandleMove
+    ): LazySelectionHaptics = LazySelectionHaptics(
+        enabled = enabled,
+        hapticFeedbackType = hapticFeedbackType
     )
 
     /**

@@ -53,6 +53,7 @@ import androidx.compose.ui.geometry.Offset
  * @param modifier Modifier applied to the outer container.
  * @param selectionState The state holder for the selection.
  * @param colors Configuration for colors used in text selection.
+ * @param haptics Configuration for haptics used during text selection.
  * @param autoScroll Configuration for edge auto-scrolling during text selection drag.
  * @param magnifier Configuration for the magnifier loupe used during text selection drag.
  * @param toolbar Configuration for the selection toolbar used during text selection.
@@ -68,6 +69,7 @@ fun <T> LazySelectionContainer(
     listState: LazyListState,
     selectionState: LazySelectionState = rememberLazySelectionState(),
     colors: LazySelectionColors = LazySelectionDefaults.colors(),
+    haptics: LazySelectionHaptics = LazySelectionDefaults.haptics(),
     autoScroll: LazySelectionAutoScroll = LazySelectionDefaults.autoScroll(),
     magnifier: LazySelectionMagnifier = LazySelectionDefaults.magnifier(),
     toolbar: LazySelectionToolbar = LazySelectionDefaults.toolbar(),
@@ -77,7 +79,8 @@ fun <T> LazySelectionContainer(
 ) {
     CompositionLocalProvider(
         LocalLazySelectionState provides selectionState,
-        LocalLazySelectionColors provides colors
+        LocalLazySelectionColors provides colors,
+        LocalLazySelectionHaptics provides haptics
     ) {
         Box(
             modifier = modifier

@@ -149,12 +149,17 @@ private fun SelectionToolbarActionButton(
     onClick: () -> Unit
 ) {
     val haptic = LocalHapticFeedback.current
+    val hapticsConfig = LocalLazySelectionHaptics.current ?: LazySelectionDefaults.haptics()
 
     TextButton(
         modifier = modifier,
         colors = ButtonDefaults.textButtonColors(contentColor = contentColor),
         onClick = {
-            haptic.performHapticFeedback(HapticFeedbackType.VirtualKey)
+            if (hapticsConfig.enabled) {
+                haptic.performHapticFeedback(
+                    hapticsConfig.hapticFeedbackType ?: HapticFeedbackType.TextHandleMove
+                )
+            }
             onClick()
         },
     ) {

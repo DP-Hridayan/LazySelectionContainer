@@ -61,13 +61,18 @@ internal fun updateSelectionForVisualHandle(
     isStartVisual: Boolean,
     line: Int,
     offset: Int,
+    onSelectionChanged: () -> Unit = {}
 ) {
     val current = selectionState.selection ?: return
     val swapped = current != current.normalized()
     val writeRawStart = if (isStartVisual) !swapped else swapped
     val newSel = if (writeRawStart) current.copy(startLine = line, startOffset = offset)
     else current.copy(endLine = line, endOffset = offset)
-    selectionState.selection = newSel
+    
+    if (selectionState.selection != newSel) {
+        selectionState.selection = newSel
+        onSelectionChanged()
+    }
 }
 
 internal fun computeHandleOffset(
@@ -80,9 +85,11 @@ internal fun computeHandleOffset(
     val cursorRect = info.layoutResult.getCursorRect(charOffset.coerceIn(0, textLength))
     val windowPoint = info.boundsInWindow.topLeft + Offset(cursorRect.left, cursorRect.bottom)
     val local = windowPoint - selectionState.containerWindowOrigin
+
     if (local.y < 0f || local.y > selectionState.containerHeightPx) {
         return null
     }
+
     return local
 }
 
@@ -116,15 +123,18 @@ internal suspend fun <T> copySelection(
 internal fun findLineOffset(state: LazySelectionState, globalPos: Offset): Pair<Int, Int>? {
     for ((index, info) in state.lineInfos) {
         val b = info.boundsInWindow
+
         if (globalPos.y in b.top..b.bottom) {
             val local = Offset(
                 x = (globalPos.x - b.left).coerceIn(0f, b.width),
                 y = (globalPos.y - b.top).coerceIn(0f, b.height)
             )
+
             val offset = info.layoutResult.getOffsetForPosition(local)
             return index to offset
         }
     }
+
     return null
 }
 

@@ -44,6 +44,7 @@ fun <T> Modifier.textSelectionGestures(
     autoScrollSpeed: Dp = 4.dp,
 ): Modifier = composed {
     val haptic = LocalHapticFeedback.current
+    val hapticsConfig = LocalLazySelectionHaptics.current ?: LazySelectionDefaults.haptics()
     val density = LocalDensity.current
     val coroutineScope = rememberCoroutineScope()
     val edgeThresholdPx = with(density) { autoScrollEdgeThreshold.toPx() }
@@ -51,6 +52,14 @@ fun <T> Modifier.textSelectionGestures(
 
     val currentItems by rememberUpdatedState(items)
     val currentTextOf by rememberUpdatedState(textOf)
+
+    val performSelectionHaptic = {
+        if (hapticsConfig.enabled) {
+            hapticsConfig.hapticFeedbackType?.let {
+                haptic.performHapticFeedback(it)
+            }
+        }
+    }
 
     this
         .onGloballyPositioned { coords ->
@@ -76,11 +85,16 @@ fun <T> Modifier.textSelectionGestures(
                 val startGlobal = longPress.position + selectionState.containerWindowOrigin
                 val start = findLineOffset(selectionState, startGlobal) ?: return@awaitEachGesture
 
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                if (hapticsConfig.enabled) {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                }
+
                 selectionState.handlesVisible = false
                 selectionState.toolbarVisible = false
+
                 val lineText = currentTextOf(currentItems[start.first])
                 val wordRange = wordBoundsAt(lineText, start.second)
+
                 selectionState.selection =
                     LineSelection(start.first, wordRange.first, start.first, wordRange.last)
 
@@ -88,6 +102,7 @@ fun <T> Modifier.textSelectionGestures(
                 val magResult1 = computeMagnifierOffset(
                     selectionState, start.first, start.second, longPress.position.x
                 )
+
                 if (magResult1 != null) {
                     selectionState.magnifierOffset = magResult1.first
                     selectionState.magnifierLineHeightPx = magResult1.second
@@ -104,35 +119,42 @@ fun <T> Modifier.textSelectionGestures(
                             listState, pointerPosRef.value.y, selectionState.containerHeightPx,
                             edgeThresholdPx, scrollSpeedPx
                         )
+
                         val globalPos = pointerPosRef.value + selectionState.containerWindowOrigin
                         val end = findLineOffsetOrNearestEdge(selectionState, globalPos)
 
                         if (end != null) {
                             val isInsideInitialWord =
                                 end.first == initialLine && end.second in initialWordRange
-                            if (isInsideInitialWord) {
-                                selectionState.selection = LineSelection(
+
+                            val newSel = if (isInsideInitialWord) {
+                                LineSelection(
                                     startLine = initialLine, startOffset = initialWordRange.first,
                                     endLine = initialLine, endOffset = initialWordRange.last
                                 )
                             } else {
                                 val isBefore =
                                     end.first < initialLine || (end.first == initialLine && end.second < initialWordRange.first)
+
                                 if (isBefore) {
-                                    selectionState.selection = LineSelection(
+                                    LineSelection(
                                         startLine = initialLine,
                                         startOffset = initialWordRange.last,
                                         endLine = end.first,
                                         endOffset = end.second
                                     )
                                 } else {
-                                    selectionState.selection = LineSelection(
+                                    LineSelection(
                                         startLine = initialLine,
                                         startOffset = initialWordRange.first,
                                         endLine = end.first,
                                         endOffset = end.second
                                     )
                                 }
+                            }
+                            if (selectionState.selection != newSel) {
+                                performSelectionHaptic()
+                                selectionState.selection = newSel
                             }
 
                             val magResult2 = computeMagnifierOffset(
@@ -156,10 +178,13 @@ fun <T> Modifier.textSelectionGestures(
 
                 loopJob.cancel()
                 selectionState.magnifierOffset = null
+
                 val finalSelection = selectionState.selection
                 val hasSelection = finalSelection != null
+
                 selectionState.handlesVisible = hasSelection
                 selectionState.toolbarVisible = hasSelection
+
                 if (finalSelection != null) {
                     selectionState.toolbarPinnedEnd =
                         if (finalSelection == finalSelection.normalized()) SelectionEnd.END else SelectionEnd.START

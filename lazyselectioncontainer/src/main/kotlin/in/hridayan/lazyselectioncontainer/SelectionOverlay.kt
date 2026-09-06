@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
@@ -38,12 +39,22 @@ internal fun <T> SelectionHandlesOverlay(
     if (!selectionState.handlesVisible) return
 
     val clipboard = LocalClipboard.current
+    val haptic = LocalHapticFeedback.current
+    val hapticsConfig = LocalLazySelectionHaptics.current ?: LazySelectionDefaults.haptics()
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     val edgeThresholdPx = with(density) { autoScrollEdgeThreshold.toPx() }
     val scrollSpeedPx = with(density) { autoScrollSpeed.toPx() }
 
     val dragAnchor = remember { Ref<Pair<Int, Int>?>(null) }
+
+    val performSelectionHaptic = {
+        if (hapticsConfig.enabled) {
+            hapticsConfig.hapticFeedbackType?.let {
+                haptic.performHapticFeedback(it)
+            }
+        }
+    }
 
     fun doCopy() {
         scope.launch {
@@ -120,10 +131,12 @@ internal fun <T> SelectionHandlesOverlay(
                 val global = rawPos + selectionState.containerWindowOrigin
                 val result = findLineOffsetOrNearestEdge(selectionState, global)
                 val anchor = dragAnchor.value
+
                 if (result != null && anchor != null) {
                     val magResult = computeMagnifierOffset(
                         selectionState, result.first, result.second, rawPos.x
                     )
+
                     if (magResult != null) {
                         selectionState.magnifierOffset = magResult.first
                         selectionState.magnifierLineHeightPx = magResult.second
@@ -131,18 +144,23 @@ internal fun <T> SelectionHandlesOverlay(
                         selectionState.magnifierOffset = null
                     }
 
-                    selectionState.selection = LineSelection(
+                    val newSel = LineSelection(
                         startLine = result.first,
                         startOffset = result.second,
                         endLine = anchor.first,
                         endOffset = anchor.second,
                     )
+                    if (selectionState.selection != newSel) {
+                        performSelectionHaptic()
+                        selectionState.selection = newSel
+                    }
                 } else if (result != null) {
                     updateSelectionForVisualHandle(
                         selectionState,
                         isStartVisual = true,
                         line = result.first,
-                        offset = result.second
+                        offset = result.second,
+                        onSelectionChanged = performSelectionHaptic
                     )
                 }
             },
@@ -180,10 +198,12 @@ internal fun <T> SelectionHandlesOverlay(
                 val global = rawPos + selectionState.containerWindowOrigin
                 val result = findLineOffsetOrNearestEdge(selectionState, global)
                 val anchor = dragAnchor.value
+
                 if (result != null && anchor != null) {
                     val magResult = computeMagnifierOffset(
                         selectionState, result.first, result.second, rawPos.x
                     )
+
                     if (magResult != null) {
                         selectionState.magnifierOffset = magResult.first
                         selectionState.magnifierLineHeightPx = magResult.second
@@ -191,18 +211,24 @@ internal fun <T> SelectionHandlesOverlay(
                         selectionState.magnifierOffset = null
                     }
 
-                    selectionState.selection = LineSelection(
+                    val newSel = LineSelection(
                         startLine = anchor.first,
                         startOffset = anchor.second,
                         endLine = result.first,
                         endOffset = result.second,
                     )
+
+                    if (selectionState.selection != newSel) {
+                        performSelectionHaptic()
+                        selectionState.selection = newSel
+                    }
                 } else if (result != null) {
                     updateSelectionForVisualHandle(
                         selectionState,
                         isStartVisual = false,
                         line = result.first,
-                        offset = result.second
+                        offset = result.second,
+                        onSelectionChanged = performSelectionHaptic
                     )
                 }
             },
