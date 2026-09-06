@@ -1,13 +1,13 @@
 [versions]
 activityCompose = "1.13.0"
-agp = "9.2.1"
-composeBom = "2026.06.00"
+agp = "9.4.0"
+composeBom = "2026.08.00"
 coreKtx = "1.19.0"
-kotlin = "2.4.0"
+kotlin = "2.4.10"
 material = "1.14.0"
-material3 = "1.5.0-alpha22"
+material3 = "1.5.0-alpha27"
 materialIconsExtended = "1.7.8"
-appcompat = "1.7.1"
+appcompat = "1.8.0"
 vanniktech-maven-publish = "0.37.0"
 
 [plugins]
