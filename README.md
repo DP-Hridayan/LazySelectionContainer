@@ -191,6 +191,10 @@ LazySelectionContainer(
     toolbar = LazySelectionDefaults.toolbar(
         behavior = LazySelectionToolbarBehavior.FloatingAboveSelection, // Or PinnedToDragHandle
         shape = RoundedCornerShape(50) // Change the shape of the toolbar popup
+    ),
+    haptics = LazySelectionDefaults.haptics(
+        enabled = true,                                         // Enable/disable haptics
+        hapticFeedbackType = HapticFeedbackType.TextHandleMove  // Configure the haptic type
     )
 ) {
    // ...
